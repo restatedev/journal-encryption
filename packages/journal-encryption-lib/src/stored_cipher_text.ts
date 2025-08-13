@@ -22,25 +22,27 @@ export class StoredCipherText {
 
     const unprefixedData = data.slice(this.STORED_PREFIX.length);
 
-    if (unprefixedData.length == 0) {
+    const encryptedDekLengthBytes = unprefixedData.slice(0, 2);
+    if (encryptedDekLengthBytes.length !== 2) {
       throw new Error("Invalid stored ciphertext length");
     }
+    // big endian u16
+    const encryptedDekLength =
+      encryptedDekLengthBytes[0] * 2 ** 8 + encryptedDekLengthBytes[1];
 
-    const encryptedDekLength = unprefixedData[0];
-
-    const encryptedDek = unprefixedData.slice(1, encryptedDekLength + 1);
+    const encryptedDek = unprefixedData.slice(2, encryptedDekLength + 2);
     if (encryptedDek.length !== encryptedDekLength) {
       throw new Error("Invalid stored ciphertext length");
     }
     const iv = unprefixedData.slice(
-      encryptedDekLength + 1,
-      encryptedDekLength + 1 + this.IV_LENGTH
+      encryptedDekLength + 2,
+      encryptedDekLength + 2 + this.IV_LENGTH
     );
     if (iv.length !== this.IV_LENGTH) {
       throw new Error("Invalid stored ciphertext length");
     }
     const cipherText = unprefixedData.slice(
-      encryptedDekLength + 1 + this.IV_LENGTH
+      encryptedDekLength + 2 + this.IV_LENGTH
     );
 
     return new StoredCipherText(
@@ -85,23 +87,27 @@ export class StoredCipherText {
 
     const data = new Uint8Array(
       StoredCipherText.STORED_PREFIX.length +
-        1 +
+        2 +
         this.encryptedDek.length +
         StoredCipherText.IV_LENGTH +
         this.cipherText.byteLength
     );
 
     data.set(StoredCipherText.STORED_PREFIX, 0);
-    data.set([this.encryptedDek.length], StoredCipherText.STORED_PREFIX.length);
-    data.set(this.encryptedDek, StoredCipherText.STORED_PREFIX.length + 1);
+    data.set(
+      // big endian u16
+      [this.encryptedDek.length >>> 8, this.encryptedDek.length],
+      StoredCipherText.STORED_PREFIX.length
+    );
+    data.set(this.encryptedDek, StoredCipherText.STORED_PREFIX.length + 2);
     data.set(
       this.iv,
-      StoredCipherText.STORED_PREFIX.length + 1 + this.encryptedDek.length
+      StoredCipherText.STORED_PREFIX.length + 2 + this.encryptedDek.length
     );
     data.set(
       this.cipherText,
       StoredCipherText.STORED_PREFIX.length +
-        1 +
+        2 +
         this.encryptedDek.length +
         StoredCipherText.IV_LENGTH
     );
