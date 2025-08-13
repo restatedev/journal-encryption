@@ -2,6 +2,7 @@ import { KMSClient } from "@aws-sdk/client-kms";
 import { Hono } from "hono";
 import { handle } from "hono/aws-lambda";
 import { createJournalEntryCodec } from "@restatedev/journal-encryption-lib";
+import { cors } from "hono/cors";
 
 const KMS_KEY_ID = process.env.KMS_KEY_ID;
 if (!KMS_KEY_ID) {
@@ -14,6 +15,16 @@ const { encode, decode } = createJournalEntryCodec({
 });
 
 const app = new Hono();
+
+app.use(
+  "/*",
+  cors({
+    origin: "*",
+    allowMethods: ["POST"],
+    maxAge: 600,
+    credentials: true,
+  })
+);
 
 app.post("/encrypt", async (c) => {
   try {
