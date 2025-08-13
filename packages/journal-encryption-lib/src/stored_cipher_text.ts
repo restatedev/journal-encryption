@@ -1,7 +1,7 @@
 import { webcrypto } from "node:crypto";
 
 export class StoredCipherText {
-  private static STORED_PREFIX = Buffer.from("RTv1\0");
+  private static STORED_PREFIX = new TextEncoder().encode("RTv1\0");
   public static IV_LENGTH = 12;
   private static ENCRYPTED_KEY_LENGTH = 184;
 
@@ -11,31 +11,36 @@ export class StoredCipherText {
     public cipherText: Uint8Array
   ) {}
 
-  static fromBuffer(data: Buffer): StoredCipherText {
+  static fromArrayBuffer(data: ArrayBuffer): StoredCipherText {
     if (
-      data.length <=
+      data.byteLength <=
       this.STORED_PREFIX.length + this.ENCRYPTED_KEY_LENGTH + this.IV_LENGTH
     ) {
       throw new Error("Invalid data length");
     }
 
-    const prefix = data.subarray(0, 0 + this.STORED_PREFIX.length);
-    if (!this.STORED_PREFIX.equals(prefix)) {
+    const prefix = new Uint8Array(data.slice(0, 0 + this.STORED_PREFIX.length));
+
+    if (!this.STORED_PREFIX.every((value, i) => value === prefix[i])) {
       throw new Error("Invalid data prefix");
     }
 
-    const unprefixedData = data.subarray(this.STORED_PREFIX.length);
+    const unprefixedData = data.slice(this.STORED_PREFIX.length);
 
-    const encryptedDek = unprefixedData.subarray(0, this.ENCRYPTED_KEY_LENGTH);
-    const iv = unprefixedData.subarray(
+    const encryptedDek = unprefixedData.slice(0, this.ENCRYPTED_KEY_LENGTH);
+    const iv = unprefixedData.slice(
       this.ENCRYPTED_KEY_LENGTH,
       this.ENCRYPTED_KEY_LENGTH + this.IV_LENGTH
     );
-    const cipherText = unprefixedData.subarray(
+    const cipherText = unprefixedData.slice(
       this.ENCRYPTED_KEY_LENGTH + this.IV_LENGTH
     );
 
-    return new StoredCipherText(encryptedDek, iv, cipherText);
+    return new StoredCipherText(
+      new Uint8Array(encryptedDek),
+      new Uint8Array(iv),
+      new Uint8Array(cipherText)
+    );
   }
 
   async decrypt(decryptingDek: webcrypto.CryptoKey): Promise<ArrayBuffer> {
@@ -62,17 +67,20 @@ export class StoredCipherText {
     return new StoredCipherText(encryptedDek, iv, new Uint8Array(result));
   }
 
-  toBuffer(): Buffer {
-    if (this.encryptedDek.length !== StoredCipherText.ENCRYPTED_KEY_LENGTH) {
+  toArrayBuffer(): ArrayBuffer {
+    if (
+      this.encryptedDek.byteLength !== StoredCipherText.ENCRYPTED_KEY_LENGTH
+    ) {
       throw new Error("Unexpected encrypted dek length");
     }
 
-    const data = Buffer.alloc(
+    const data = new Uint8Array(
       StoredCipherText.STORED_PREFIX.length +
         StoredCipherText.ENCRYPTED_KEY_LENGTH +
         StoredCipherText.IV_LENGTH +
-        this.cipherText.length
+        this.cipherText.byteLength
     );
+
     data.set(StoredCipherText.STORED_PREFIX, 0);
     data.set(this.encryptedDek, StoredCipherText.STORED_PREFIX.length);
     data.set(
@@ -87,6 +95,6 @@ export class StoredCipherText {
         StoredCipherText.IV_LENGTH
     );
 
-    return data;
+    return data.buffer;
   }
 }

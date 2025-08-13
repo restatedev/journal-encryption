@@ -28,7 +28,7 @@ app.post("/encrypt", async (c) => {
       data
     );
 
-    return c.body(storedCipherText.toBuffer(), 200, {
+    return c.body(storedCipherText.toArrayBuffer(), 200, {
       "Content-Type": "application/octet-stream",
     });
   } catch (e) {
@@ -41,7 +41,7 @@ app.post("/decrypt", async (c) => {
   try {
     const data = await c.req.arrayBuffer();
 
-    const storedCipherText = StoredCipherText.fromBuffer(Buffer.from(data));
+    const storedCipherText = StoredCipherText.fromArrayBuffer(data);
 
     const decryptingDek = await dekCache.getDecryptingDek(
       storedCipherText.encryptedDek
