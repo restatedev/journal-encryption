@@ -1,0 +1,26 @@
+{
+  "name": "journal-encryption-server",
+  "type": "module",
+  "scripts": {
+    "build": "esbuild --bundle --outfile=./dist/index.js --platform=node --target=node20 ./src/index.ts",
+    "zip": "zip -j lambda.zip dist/index.js",
+    "update": "aws lambda update-function-code --zip-file fileb://lambda.zip --function-name journal-encryption-server",
+    "deploy": "run-s build zip update",
+    "dev": "bun run src/index.ts --watch",
+    "cdk:diff": "cdk diff --app 'tsx bin/server.ts'",
+    "cdk:deploy": "cdk diff --app 'tsx bin/server.ts'"
+  },
+  "devDependencies": {
+    "@types/node": "^24.2.1",
+    "aws-cdk": "^2.1024.0",
+    "aws-cdk-lib": "^2.211.0",
+    "constructs": "^10.4.2",
+    "esbuild": "^0.21.4",
+    "npm-run-all2": "^6.2.0",
+    "source-map-support": "^0.5.21"
+  },
+  "dependencies": {
+    "@aws-sdk/client-kms": "^3.864.0",
+    "hono": "^4.9.1"
+  }
+}
