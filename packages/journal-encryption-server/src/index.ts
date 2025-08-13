@@ -10,7 +10,7 @@ if (!KMS_KEY_ID) {
 
 const { encode, decode } = createJournalEntryCodec({
   kms: new KMSClient({}),
-  kmsKeyID: KMS_KEY_ID,
+  encryptingKmsKeyID: KMS_KEY_ID,
 });
 
 const app = new Hono();

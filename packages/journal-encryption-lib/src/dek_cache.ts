@@ -13,13 +13,19 @@ interface EncryptingDek {
 
 export class DekCache {
   private kms: KMSClient;
-  private kmsKeyID: string;
+  private encryptingKmsKeyID: string;
   private encryptingDek?: Promise<EncryptingDek>;
   private decryptingDeks: Map<string, Promise<webcrypto.CryptoKey>>;
 
-  constructor({ kms, kmsKeyID }: { kms: KMSClient; kmsKeyID: string }) {
+  constructor({
+    kms,
+    encryptingKmsKeyID,
+  }: {
+    kms: KMSClient;
+    encryptingKmsKeyID: string;
+  }) {
     this.kms = kms;
-    this.kmsKeyID = kmsKeyID;
+    this.encryptingKmsKeyID = encryptingKmsKeyID;
     this.encryptingDek = undefined;
     this.decryptingDeks = new Map();
   }
@@ -65,7 +71,7 @@ export class DekCache {
     const start = new Date();
     const dekResult = await this.kms.send(
       new GenerateDataKeyCommand({
-        KeyId: this.kmsKeyID,
+        KeyId: this.encryptingKmsKeyID,
         KeySpec: "AES_256", // 32 byte keys, 184 byte encrypted keys
       })
     );
@@ -126,7 +132,6 @@ export class DekCache {
     const start = new Date();
     const dekResult = await this.kms.send(
       new DecryptCommand({
-        KeyId: this.kmsKeyID,
         CiphertextBlob: encryptedDek,
       })
     );

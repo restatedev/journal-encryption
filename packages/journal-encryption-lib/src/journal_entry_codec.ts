@@ -4,14 +4,14 @@ import { StoredCipherText } from "./stored_cipher_text.js";
 
 export function createJournalEntryCodec({
   kms,
-  kmsKeyID,
+  encryptingKmsKeyID,
 }: {
   kms: KMSClient;
-  kmsKeyID: string;
+  encryptingKmsKeyID: string;
 }) {
   const dekCache = new DekCache({
     kms,
-    kmsKeyID,
+    encryptingKmsKeyID,
   });
   // start loading this in the background
   dekCache.getEncryptingDek();
