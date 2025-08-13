@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": ".",
+    "target": "esnext",
+    "module": "nodenext",
+    "lib": ["esnext"],
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "strict": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "noImplicitThis": true,
+    "paths": {
+      "@restatedev/journal-encryption-lib": [
+        "./packages/journal-encryption-lib/src/public_api.ts"
+      ]
+    }
+  }
+}
