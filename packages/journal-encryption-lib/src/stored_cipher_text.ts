@@ -11,7 +11,7 @@ export class StoredCipherText {
     public cipherText: Uint8Array
   ) {}
 
-  static fromArrayBuffer(data: ArrayBuffer): StoredCipherText {
+  static fromBytes(data: Uint8Array): StoredCipherText {
     if (
       data.byteLength <=
       this.STORED_PREFIX.length + this.ENCRYPTED_KEY_LENGTH + this.IV_LENGTH
@@ -43,18 +43,20 @@ export class StoredCipherText {
     );
   }
 
-  async decrypt(decryptingDek: webcrypto.CryptoKey): Promise<ArrayBuffer> {
-    return await webcrypto.subtle.decrypt(
-      { name: "AES-GCM", iv: this.iv },
-      decryptingDek,
-      this.cipherText
+  async decrypt(decryptingDek: webcrypto.CryptoKey): Promise<Uint8Array> {
+    return new Uint8Array(
+      await webcrypto.subtle.decrypt(
+        { name: "AES-GCM", iv: this.iv },
+        decryptingDek,
+        this.cipherText
+      )
     );
   }
 
   static async encrypt(
     encryptedDek: Uint8Array,
     key: webcrypto.CryptoKey,
-    data: ArrayBuffer
+    data: Uint8Array
   ): Promise<StoredCipherText> {
     const iv = webcrypto.getRandomValues(new Uint8Array(this.IV_LENGTH));
 
@@ -67,7 +69,7 @@ export class StoredCipherText {
     return new StoredCipherText(encryptedDek, iv, new Uint8Array(result));
   }
 
-  toArrayBuffer(): ArrayBuffer {
+  toBytes(): Uint8Array {
     if (
       this.encryptedDek.byteLength !== StoredCipherText.ENCRYPTED_KEY_LENGTH
     ) {
@@ -95,6 +97,6 @@ export class StoredCipherText {
         StoredCipherText.IV_LENGTH
     );
 
-    return data.buffer;
+    return data;
   }
 }

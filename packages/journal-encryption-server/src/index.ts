@@ -1,34 +1,27 @@
 import { KMSClient } from "@aws-sdk/client-kms";
 import { Hono } from "hono";
 import { handle } from "hono/aws-lambda";
-import { DekCache, StoredCipherText } from "@restatedev/journal-encryption-lib";
+import { createJournalEntryCodec } from "@restatedev/journal-encryption-lib";
 
 const KMS_KEY_ID = process.env.KMS_KEY_ID;
 if (!KMS_KEY_ID) {
   throw new Error("Missing environment variable KMS_KEY_ID");
 }
 
-const dekCache = new DekCache({
+const { encode, decode } = createJournalEntryCodec({
   kms: new KMSClient({}),
   kmsKeyID: KMS_KEY_ID,
 });
-// kick off getting the first encrypting dek in the background
-dekCache.getEncryptingDek();
 
 const app = new Hono();
 
 app.post("/encrypt", async (c) => {
   try {
-    const encryptingDek = await dekCache.getEncryptingDek();
     const data = await c.req.arrayBuffer();
 
-    const storedCipherText = await StoredCipherText.encrypt(
-      encryptingDek.encryptedDek,
-      encryptingDek.key,
-      data
-    );
+    const encryptedData = await encode(new Uint8Array(data));
 
-    return c.body(storedCipherText.toArrayBuffer(), 200, {
+    return c.body(encryptedData, 200, {
       "Content-Type": "application/octet-stream",
     });
   } catch (e) {
@@ -40,16 +33,9 @@ app.post("/encrypt", async (c) => {
 app.post("/decrypt", async (c) => {
   try {
     const data = await c.req.arrayBuffer();
+    const decryptedData = await decode(new Uint8Array(data));
 
-    const storedCipherText = StoredCipherText.fromArrayBuffer(data);
-
-    const decryptingDek = await dekCache.getDecryptingDek(
-      storedCipherText.encryptedDek
-    );
-
-    const result = await storedCipherText.decrypt(decryptingDek);
-
-    return c.body(result, 200, {
+    return c.body(decryptedData, 200, {
       "Content-Type": "application/octet-stream",
     });
   } catch (e) {
