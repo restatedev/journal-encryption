@@ -13,8 +13,8 @@ export function createJournalEntryCodec({
     kms,
     encryptingKmsKeyID,
   });
-  // start loading this in the background
-  dekCache.getEncryptingDek();
+  // start loading a encrypting dek in the background
+  dekCache.getEncryptingDek().catch((e) => {});
 
   return {
     async encode(buf: Uint8Array): Promise<Uint8Array> {

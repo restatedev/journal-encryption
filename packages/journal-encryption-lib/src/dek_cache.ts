@@ -68,47 +68,57 @@ export class DekCache {
   }
 
   async createEncryptingDek() {
-    const start = new Date();
-    const dekResult = await this.kms.send(
-      new GenerateDataKeyCommand({
-        KeyId: this.encryptingKmsKeyID,
-        KeySpec: "AES_256", // 32 byte keys, 184 byte encrypted keys
-      })
-    );
-    console.log(
-      `Loaded process-wide encrypting dek in ${
-        new Date().valueOf() - start.valueOf()
-      }ms`
-    );
+    try {
+      const start = new Date();
+      const dekResult = await this.kms.send(
+        new GenerateDataKeyCommand({
+          KeyId: this.encryptingKmsKeyID,
+          KeySpec: "AES_256", // 32 byte keys, 184 byte encrypted keys
+        })
+      );
 
-    if (!dekResult.Plaintext) {
-      throw new Error("Missing dek plaintext");
+      if (!dekResult.Plaintext) {
+        throw new Error("Missing dek plaintext");
+      }
+      if (!dekResult.CiphertextBlob) {
+        throw new Error("Missing dek ciphertext");
+      }
+
+      const [encryptingDek, decryptingDek] = await Promise.all([
+        webcrypto.subtle.importKey(
+          "raw",
+          dekResult.Plaintext,
+          "AES-GCM",
+          false,
+          ["encrypt"]
+        ),
+        webcrypto.subtle.importKey(
+          "raw",
+          dekResult.Plaintext,
+          "AES-GCM",
+          false,
+          ["decrypt"]
+        ),
+      ]);
+
+      console.log(
+        `Created encrypting dek against KMS key '${
+          this.encryptingKmsKeyID
+        }' in ${new Date().valueOf() - start.valueOf()}ms`
+      );
+
+      return {
+        encryptedDek: dekResult.CiphertextBlob,
+        encryptingDek,
+        decryptingDek,
+      };
+    } catch (e) {
+      console.log(
+        `Failed to create encrypting dek against KMS key '${this.encryptingKmsKeyID}':`,
+        e
+      );
+      throw e;
     }
-    if (!dekResult.CiphertextBlob) {
-      throw new Error("Missing dek ciphertext");
-    }
-
-    const encryptingDek = await webcrypto.subtle.importKey(
-      "raw",
-      dekResult.Plaintext,
-      "AES-GCM",
-      false,
-      ["encrypt"]
-    );
-
-    const decryptingDek = await webcrypto.subtle.importKey(
-      "raw",
-      dekResult.Plaintext,
-      "AES-GCM",
-      false,
-      ["decrypt"]
-    );
-
-    return {
-      encryptedDek: dekResult.CiphertextBlob,
-      encryptingDek,
-      decryptingDek,
-    };
   }
 
   async getDecryptingDek(
@@ -129,28 +139,34 @@ export class DekCache {
   }
 
   async decryptDek(encryptedDek: Uint8Array): Promise<webcrypto.CryptoKey> {
-    const start = new Date();
-    const dekResult = await this.kms.send(
-      new DecryptCommand({
-        CiphertextBlob: encryptedDek,
-      })
-    );
-    console.log(
-      `Loaded decryping dek in ${new Date().valueOf() - start.valueOf()}ms`
-    );
+    try {
+      const start = new Date();
+      const dekResult = await this.kms.send(
+        new DecryptCommand({
+          CiphertextBlob: encryptedDek,
+        })
+      );
 
-    if (!dekResult.Plaintext) {
-      throw new Error("Missing dek plaintext");
+      if (!dekResult.Plaintext) {
+        throw new Error("Missing dek plaintext");
+      }
+
+      const dek = await webcrypto.subtle.importKey(
+        "raw",
+        dekResult.Plaintext,
+        "AES-GCM",
+        false,
+        ["decrypt"]
+      );
+
+      console.log(
+        `Loaded decryping dek in ${new Date().valueOf() - start.valueOf()}ms`
+      );
+
+      return dek;
+    } catch (e) {
+      console.log("Failed to load decrypting dek:", e);
+      throw e;
     }
-
-    const dek = await webcrypto.subtle.importKey(
-      "raw",
-      dekResult.Plaintext,
-      "AES-GCM",
-      false,
-      ["decrypt"]
-    );
-
-    return dek;
   }
 }
