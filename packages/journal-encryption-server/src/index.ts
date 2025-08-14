@@ -9,7 +9,7 @@ if (!KMS_KEY_ID) {
   throw new Error("Missing environment variable KMS_KEY_ID");
 }
 
-const { encode, decode } = createJournalEntryCodec({
+const { encode, decode } = await createJournalEntryCodec({
   kms: new KMSClient({}),
   encryptingKmsKeyID: KMS_KEY_ID,
 });
@@ -30,7 +30,7 @@ app.post("/encrypt", async (c) => {
   try {
     const data = await c.req.arrayBuffer();
 
-    const encryptedData = await encode(new Uint8Array(data));
+    const encryptedData = encode(new Uint8Array(data));
 
     return c.body(encryptedData, 200, {
       "Content-Type": "application/octet-stream",

@@ -1,8 +1,9 @@
 import { KMSClient } from "@aws-sdk/client-kms";
 import { DekCache } from "./dek_cache.js";
 import { StoredCipherText } from "./stored_cipher_text.js";
+import { KeyObject } from "node:crypto";
 
-export function createJournalEntryCodec({
+export async function createJournalEntryCodec({
   kms,
   encryptingKmsKeyID,
 }: {
@@ -13,16 +14,14 @@ export function createJournalEntryCodec({
     kms,
     encryptingKmsKeyID,
   });
-  // start loading a encrypting dek in the background
-  dekCache.getEncryptingDek().catch((e) => {});
+  const encryptingDek = await dekCache.getEncryptingDek();
+  const encryptingDekKeyObject = KeyObject.from(encryptingDek.key);
 
   return {
-    async encode(buf: Uint8Array): Promise<Uint8Array> {
-      const encryptingDek = await dekCache.getEncryptingDek();
-
-      const storedCipherText = await StoredCipherText.encrypt(
+    encode(buf: Uint8Array): Uint8Array {
+      const storedCipherText = StoredCipherText.encryptSync(
         encryptingDek.encryptedDek,
-        encryptingDek.key,
+        encryptingDekKeyObject,
         buf
       );
 
