@@ -1,4 +1,4 @@
-import { webcrypto } from "node:crypto";
+import * as crypto from "node:crypto";
 
 export class StoredCipherText {
   private static STORED_PREFIX = new TextEncoder().encode("RTv1\0");
@@ -52,30 +52,53 @@ export class StoredCipherText {
     );
   }
 
-  async decrypt(decryptingDek: webcrypto.CryptoKey): Promise<Uint8Array> {
+  async decrypt(
+    decryptingDek: crypto.webcrypto.CryptoKey
+  ): Promise<Uint8Array> {
     return new Uint8Array(
-      await webcrypto.subtle.decrypt(
-        { name: "AES-GCM", iv: this.iv },
+      await crypto.webcrypto.subtle.decrypt(
+        { name: "AES-GCM", iv: this.iv, tagLength: 128 },
         decryptingDek,
         this.cipherText
       )
     );
   }
 
-  static async encrypt(
+  static async encryptAsync(
     encryptedDek: Uint8Array,
-    key: webcrypto.CryptoKey,
+    key: crypto.webcrypto.CryptoKey,
     data: Uint8Array
   ): Promise<StoredCipherText> {
-    const iv = webcrypto.getRandomValues(new Uint8Array(this.IV_LENGTH));
+    const iv = crypto.webcrypto.getRandomValues(new Uint8Array(this.IV_LENGTH));
 
-    const result = await webcrypto.subtle.encrypt(
-      { name: "AES-GCM", iv },
+    const result = await crypto.webcrypto.subtle.encrypt(
+      { name: "AES-GCM", iv, tagLength: 128 },
       key,
       data
     );
 
     return new StoredCipherText(encryptedDek, iv, new Uint8Array(result));
+  }
+
+  static encryptSync(
+    encryptedDek: Uint8Array,
+    key: crypto.KeyObject,
+    data: Uint8Array
+  ): StoredCipherText {
+    const iv = crypto.webcrypto.getRandomValues(new Uint8Array(this.IV_LENGTH));
+
+    const cipher = crypto.createCipheriv("aes-256-gcm", key, iv, {
+      authTagLength: 16,
+    });
+    const ciphertext = cipher.update(data);
+    const padding = cipher.final(); // should be empty for aes-gcm anyway
+    const authTag = cipher.getAuthTag();
+
+    return new StoredCipherText(
+      encryptedDek,
+      iv,
+      Buffer.concat([ciphertext, padding, authTag])
+    );
   }
 
   toBytes(): Uint8Array {
