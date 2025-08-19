@@ -1,7 +1,7 @@
 {
   "name": "root",
-  "version": "1.8.1",
-  "description": "Typescript SDK for Restate",
+  "version": "1.0.0",
+  "description": "Journal encryption refernce",
   "author": "Restate Developers",
   "license": "MIT",
   "email": "code@restate.dev",
@@ -16,7 +16,8 @@
   },
   "workspaces": [
     "packages/journal-encryption-lib",
-    "packages/journal-encryption-server"
+    "packages/journal-encryption-server",
+    "packages/journal-encryption-example"
   ],
   "type": "module",
   "scripts": {

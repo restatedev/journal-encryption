@@ -1,5 +1,6 @@
 {
   "name": "@restatedev/journal-encryption-lib",
+  "version": "1.0.0",
   "description": "Journal encryption utils",
   "author": "Restate Developers",
   "license": "MIT",
