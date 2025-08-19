@@ -32,9 +32,9 @@ NOTE: If you prefer, you can create a simpler implementation that uses a static 
 
 * The input and output parameters to the handler
 * `ctx.run()` blocks 
-* Any internal RPC calls (restate message to message)
-* State
-* Awekables
+* RPC calls parameters and return values (service to service invocations)
+* State values
+* Awakeables
 * Durable promises
 
 ## Project Structure
