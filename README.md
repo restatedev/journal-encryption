@@ -51,7 +51,7 @@ To get started with this project:
 
 1. Clone the repository:
   ```bash
-  git clone https://github.com/your-repo/journal-encryption.git
+  git clone git@github.com:restatedev/journal-encryption.git 
   cd journal-encryption
   ```
 
@@ -63,13 +63,24 @@ To get started with this project:
 
 3. Set up your environment:
   - Ensure you have access to an Amazon KMS key.
+  - Provision a key, and obtain a key ID to use.
   - Set the `KMS_KEY_ID` environment variable to your KMS key ID.
 
 4. Run the decryption server locally:
   ```bash
   export KMS_KEY_ID=your-kms-key-id 
-  node packages/journal-encryption-server/dist/index.js
+  cd packages/journal-encryption-server
+  npm install
+  npm build
+  npm start
   ```
 
 5. Explore the example:
   - Navigate to the `journal-encryption-example` directory to see how to integrate this lib into a restate service.
+  - To start locally
+
+  ```bash
+  export KMS_KEY_ID=your-kms-key-id 
+  cd packages/journal-encryption-example
+  npm run dev
+  ```

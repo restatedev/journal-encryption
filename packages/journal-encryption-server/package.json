@@ -7,9 +7,10 @@
     "zip": "zip -j lambda.zip dist/index.js",
     "update": "aws lambda update-function-code --zip-file fileb://lambda.zip --function-name journal-encryption-server",
     "deploy": "run-s build zip update",
-    "dev": "bun run src/index.ts --watch",
+    "dev": "tsx --watch src/index.ts",
     "cdk:diff": "cdk diff --app 'tsx bin/server.ts'",
-    "cdk:deploy": "cdk diff --app 'tsx bin/server.ts'"
+    "cdk:deploy": "cdk diff --app 'tsx bin/server.ts'",
+    "start" : "node dist/index.js"
   },
   "devDependencies": {
     "@types/node": "^24.2.1",
@@ -21,6 +22,8 @@
     "source-map-support": "^0.5.21"
   },
   "dependencies": {
+    "tsx" : "^4.0.0",
+    "@hono/node-server": "^1.18.2",
     "@aws-sdk/client-kms": "^3.864.0",
     "@restatedev/journal-encryption-lib": "^1.0.0",
     "hono": "^4.9.1"
