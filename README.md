@@ -25,7 +25,6 @@ Here’s an ASCII representation of the value frame:
 - **Encrypted DEK (KMS)**: The Data Encryption Key encrypted using Amazon KMS.
 - **Encrypted Payload**: The actual data encrypted with the DEK using AES-GCM-256. 
 
-NOTE: if you prefer you can create a simpler implementation that uses a static key stored in a secret store, and reference that in the encrypted payload. It is up to the individual org's requirements, and tools available. 
 NOTE: If you prefer, you can create a simpler implementation that uses a static key stored in a secret store and reference that in the encrypted payload. It is up to the individual organization's requirements and available tools.
 
 ## What is actually being encrypted?
