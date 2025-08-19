@@ -1,6 +1,6 @@
 {
   "name": "journal-encryption-example",
-  "type": "module",
+  "type": "commonjs",
   "version": "1.0.0",
   "scripts": {
     "build": "esbuild --bundle --outfile=./dist/index.js --platform=node --target=node20 ./src/index.ts",
@@ -10,7 +10,7 @@
     "dev": "tsx --watch src/index.ts",
     "cdk:diff": "cdk diff --app 'tsx bin/server.ts'",
     "cdk:deploy": "cdk diff --app 'tsx bin/server.ts'",
-    "start" : "node dist/index.js"
+    "start": "node dist/index.js"
   },
   "devDependencies": {
     "@types/node": "^24.2.1",
@@ -25,8 +25,8 @@
   "dependencies": {
     "@restatedev/restate-sdk": "^1.8.0",
     "@restatedev/restate-sdk-zod": "^1.8.0",
-    "@restatedev/journal-encryption-lib" : "^1.0.0",
+    "@restatedev/journal-encryption-lib": "^1.0.0",
     "@aws-sdk/client-kms": "^3.864.0",
-    "zod" : "^3.22.4"
+    "zod": "^3.22.4"
   }
 }
