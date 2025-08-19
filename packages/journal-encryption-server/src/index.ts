@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { handle } from "hono/aws-lambda";
 import { createJournalEntryCodec } from "@restatedev/journal-encryption-lib";
 import { cors } from "hono/cors";
+import { serve } from '@hono/node-server'
 
 const KMS_KEY_ID = process.env.KMS_KEY_ID;
 if (!KMS_KEY_ID) {
@@ -57,7 +58,8 @@ app.post("/decrypt", async (c) => {
   }
 });
 
-// so that bun can also serve
-export default app;
+// setup a node server
+serve(app)
 
+// use this for AWS Lambda
 export const handler = handle(app);
