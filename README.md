@@ -17,9 +17,9 @@ The encrypted values are structured to include a prefix containing the encrypted
 Here’s an ASCII representation of the value frame:
 
 ```
-+--------------------------------+------------------+
++--------+---------------------+--------------------+
 | RTv1\0 | Encrypted DEK (KMS) | Encrypted Payload  |
-+--------------------------------+------------------+
++--------+---------------------+--------------------+
 ```
 
 - **Encrypted DEK (KMS)**: The Data Encryption Key encrypted using Amazon KMS.
