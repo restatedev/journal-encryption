@@ -28,6 +28,15 @@ Here’s an ASCII representation of the value frame:
 NOTE: if you prefer you can create a simpler implementation that uses a static key stored in a secret store, and reference that in the encrypted payload. It is up to the individual org's requirements, and tools available. 
 NOTE: If you prefer, you can create a simpler implementation that uses a static key stored in a secret store and reference that in the encrypted payload. It is up to the individual organization's requirements and available tools.
 
+## What is actually being encrypted?
+
+* The input and output parameters to the handler
+* `ctx.run()` blocks 
+* Any internal RPC calls (restate message to message)
+* State
+* Awekables
+* Durable promises
+
 ## Project Structure
 
 This repository is organized into the following components:
