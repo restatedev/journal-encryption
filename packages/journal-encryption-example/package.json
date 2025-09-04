@@ -23,10 +23,11 @@
     "tsx": "^4.0.0"
   },
   "dependencies": {
+    "@aws-sdk/client-kms": "^3.864.0",
+    "@restatedev/journal-encryption-lib": "^1.0.0",
     "@restatedev/restate-sdk": "^1.8.0",
     "@restatedev/restate-sdk-zod": "^1.8.0",
-    "@restatedev/journal-encryption-lib": "^1.0.0",
-    "@aws-sdk/client-kms": "^3.864.0",
+    "@restatedev/restate-sdk-clients": "^1.8.0",
     "zod": "^3.22.4"
   }
 }

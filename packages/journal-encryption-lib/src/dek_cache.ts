@@ -1,7 +1,6 @@
 import {
   DecryptCommand,
   GenerateDataKeyCommand,
-  KMS,
   KMSClient,
 } from "@aws-sdk/client-kms";
 import { webcrypto } from "node:crypto";
