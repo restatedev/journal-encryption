@@ -3,7 +3,7 @@ import { createJournalEntryCodec } from "@restatedev/journal-encryption-lib";
 import { JournalValueCodec } from "@restatedev/restate-sdk";
 import * as clients from "@restatedev/restate-sdk-clients";
 
-import { GreeterType } from "./greeter.js";
+import type { GreeterType } from "./greeter.js";
 
 async function main() {
   const KMS_KEY_ID = process.env.KMS_KEY_ID;
@@ -22,7 +22,7 @@ async function main() {
   });
 
   const greet = await restateClient
-    .serviceClient({ name: "greeter" } as unknown as GreeterType)
+    .serviceClient<GreeterType>({ name: "greeter" })
     .greet({ name: "Confidential" });
 
   console.log("Got response:", greet);
