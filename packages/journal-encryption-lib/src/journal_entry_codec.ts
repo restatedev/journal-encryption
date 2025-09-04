@@ -67,7 +67,7 @@ export async function createJournalEntryCodec({
   // New entries will use the new DEK.
   let state = await createEncryptionState(kms, encryptingKmsKeyID);
 
-  const rotationThreshold = rotateAfterNumberOfEntries ?? 100_000_000;
+  const rotationThreshold = rotateAfterNumberOfEntries ?? 50_000_000;
 
   return {
     encode(buf: Uint8Array): Uint8Array {
