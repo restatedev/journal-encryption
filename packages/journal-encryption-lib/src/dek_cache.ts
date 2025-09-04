@@ -1,12 +1,11 @@
 import {
   DecryptCommand,
   GenerateDataKeyCommand,
-  KMS,
   KMSClient,
 } from "@aws-sdk/client-kms";
 import { webcrypto } from "node:crypto";
 
-interface EncryptingDek {
+export interface EncryptingDek {
   key: webcrypto.CryptoKey;
   encryptedDek: Uint8Array;
 }
