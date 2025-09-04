@@ -18,9 +18,11 @@ export const greeter = service({
           })
         ),
       },
-      async (context: Context, { name }) => {
+      async (_context: Context, { name }) => {
         return { message: `Hello, ${name}!` };
       }
     ),
   },
 });
+
+export type GreeterType = typeof greeter;
