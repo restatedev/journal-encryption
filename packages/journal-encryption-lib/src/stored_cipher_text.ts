@@ -102,9 +102,9 @@ export class StoredCipherText {
   }
 
   toBytes(): Uint8Array {
-    if (this.encryptedDek.length > 255) {
+    if (this.encryptedDek.length > 65535) {
       throw new Error(
-        `StoredCipherText cannot store encrypted dek with a length of more than 255; dek was ${this.encryptedDek.length}`
+        `StoredCipherText cannot store encrypted dek with a length of more than 65536; dek was ${this.encryptedDek.length}`
       );
     }
 
