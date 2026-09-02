@@ -1,6 +1,6 @@
 # A Journal Encryption Example
 
-This project is a reference implementation of [JournalValueCodec](https://github.com/restatedev/sdk-typescript/blob/main/packages/restate-sdk-core/src/entry_codec.ts#L26) that was recently added to the TypeScript SDK to support journal encryption/decryption.
+This project is a reference implementation of [JournalValueCodec](https://github.com/restatedev/sdk-typescript/blob/main/packages/libs/restate-sdk-core/src/entry_codec.ts) to support journal encryption/decryption in the TypeScript SDK.
 
 ```ts
 export type JournalValueCodec = {
